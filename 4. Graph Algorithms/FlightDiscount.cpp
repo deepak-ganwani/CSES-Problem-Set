@@ -1,37 +1,29 @@
 #include <bits/stdc++.h>
 using namespace std;
-#ifdef ONLINE_JUDGE
-#define debug(...) 69
-#else
-#include "../../algo/debug.h"
-#endif
 #define int long long
 inline void solve(){
     int n, m; cin>>n>>m;
     vector<pair<int, int>> gr[n+1];
-    vector<int> vis(n+1,0);
-    set<pair<pair<int, int>, int>> s; // val, max, node 
+    vector<vector<int>> vis(n+1, {0,0});
+    set<vector<int>> s; // cost, dis, pos
+    s.insert({0,0,1});
     for(int i=0; i<m; i++) {
         int a, b, c; cin>>a>>b>>c;
         gr[a].push_back({b, c});
     }
-    s.insert({{0, 0}, 1});
-    while(!s.empty()) {
-        pair<pair<int, int>, int> t=*(s.begin());
+    while(s.size()) {
+        auto top=*s.begin();
         s.erase(s.begin());
-        if(vis[t.second]) continue;
-        vis[t.second]=1;
-        if(t.second==n) {
-            cout<<t.first.first<<endl;
-            break;
+        int co=top[0], us=top[1], po=top[2];
+        if(vis[po][us]) continue;
+        vis[po][us]=1;
+        if(po==n) {
+            cout<<co<<endl;
+            return;
         }
-        for(auto c:gr[t.second]) {
-            if(vis[c.first]) continue;
-            if(c.second>t.first.second) {
-                int x=c.second/2+t.first.second-t.first.second/2;
-                s.insert({{x+t.first.first, c.second}, c.first});
-            }
-            else s.insert({{t.first.first+c.second, t.first.second},c.first});
+        for(auto [c,w]:gr[po]) {
+            s.insert({co+w, us, c});
+            if(!us) s.insert({co+w/2, 1, c});
         }
     }
 }
